@@ -925,10 +925,8 @@ body {
     <button type="button" class="btn-whatsapp" onclick="enviarWhatsApp()">
       📱 Enviar por WhatsApp
     </button>
-    <button type="button" class="btn-enviar" onclick="enviarEmail()">
-      📧 Enviar por Email
-    </button>
-    <p class="btn-helper">Al presionar enviar, se abrirá WhatsApp o su app de correo con toda la información lista para enviar</p>
+
+    <p class="btn-helper">Al presionar el botón se abrirá WhatsApp con toda tu información lista para enviar</p>
   </div>
 
 </form>
@@ -1033,39 +1031,37 @@ body {
 </footer>
 
 <script>
-// ── NÚMERO WHATSAPP DE CHINA HOUSE ──
-const WA_NUMBER = "50433863017"; // ← CAMBIAR por tu número real con código de país (504 Honduras)
-const EMAIL_DESTINO = "chinahouse@correo.com"; // ← CAMBIAR por tu correo real
+const WA_NUMBER = "50433863017";
+const EMAIL_DESTINO = "caldeva.app@gmail.com";
 
-// ── PROGRESS BAR ──
+// PROGRESS BAR
 function updateProgress() {
-  const form = document.getElementById('solicitudForm');
-  const inputs = form.querySelectorAll('input[required], textarea[required]');
-  const total = inputs.length;
+  const inputs = document.querySelectorAll('#solicitudForm input[required], #solicitudForm textarea[required]');
   let filled = 0;
-  inputs.forEach(el => { if(el.value.trim() || (el.type === 'checkbox' && el.checked)) filled++; });
-  document.getElementById('progressBar').style.width = (filled/total*100) + '%';
+  inputs.forEach(el => {
+    if (el.type === 'checkbox') { if (el.checked) filled++; }
+    else if (el.value.trim()) filled++;
+  });
+  document.getElementById('progressBar').style.width = (filled / inputs.length * 100) + '%';
 }
 document.getElementById('solicitudForm').addEventListener('input', updateProgress);
 document.getElementById('solicitudForm').addEventListener('change', updateProgress);
 
-// ── TOGGLE ESTUDIO ──
+// TOGGLE ESTUDIO
 function toggleEstudio(radio) {
-  const detalle = document.getElementById('estudio_detalle');
-  detalle.style.display = radio.value === 'Sí' ? 'flex' : 'none';
+  document.getElementById('estudio_detalle').style.display = radio.value === 'Sí' ? 'flex' : 'none';
 }
 
-// ── STARS ──
+// STARS
 const ratings = {};
 function calificar(criterio, valor) {
   ratings[criterio] = valor;
-  const contenedor = document.querySelector('[data-criterio="'+criterio+'"]');
-  contenedor.querySelectorAll('.star').forEach((s, i) => {
+  document.querySelectorAll('[data-criterio="' + criterio + '"] .star').forEach((s, i) => {
     s.classList.toggle('active', i < valor);
   });
 }
 
-// ── RECOPILAR DATOS ──
+// RECOPILAR DATOS
 function recopilarDatos() {
   const form = document.getElementById('solicitudForm');
   const fd = new FormData(form);
@@ -1074,139 +1070,61 @@ function recopilarDatos() {
   return data;
 }
 
-function formatearMensaje(data, incluirEval) {
-  let msg = "🍜 *SOLICITUD DE EMPLEO — CHINA HOUSE*
-";
-  msg += "━━━━━━━━━━━━━━━━━━━━━━
-
-";
-
-  msg += "👤 *INFORMACIÓN PERSONAL*
-";
-  msg += `• Nombre: ${data.nombre || '-'}
-`;
-  msg += `• Identidad: ${data.identidad || '-'}
-`;
-  msg += `• Fecha Nac.: ${data.fecha_nac || '-'} | Edad: ${data.edad || '-'}
-`;
-  msg += `• Teléfono: ${data.telefono || '-'}
-`;
-  msg += `• Dirección: ${data.direccion || '-'}
-`;
-  msg += `• Estado civil: ${data.estado_civil || '-'} | Hijos: ${data.hijos || '0'}
-`;
-  msg += `• Licencia: ${data.licencia || '-'} | Transporte propio: ${data.transporte || '-'}
-
-`;
-
-  msg += "🎓 *INFORMACIÓN ACADÉMICA*
-";
-  msg += `• Nivel: ${data.nivel_edu || '-'}
-`;
-  msg += `• Institución: ${data.centro_edu || '-'}
-`;
-  msg += `• Estudia actualmente: ${data.estudia || '-'}
-`;
-  if(data.estudia === 'Sí') {
-    msg += `• Carrera: ${data.carrera || '-'} | Horario: ${data.horario_estudio || '-'}
-`;
-  }
-  msg += "
-";
-
-  msg += "💼 *SITUACIÓN LABORAL*
-";
-  msg += `• Situación: ${data.situacion || '-'}
-`;
-  if(data.empresa_actual) msg += `• Empresa: ${data.empresa_actual} | Cargo: ${data.cargo_actual || '-'} | Horario: ${data.horario_actual || '-'}
-`;
-  msg += `• Motivo de cambio: ${data.motivo_cambio || '-'}
-
-`;
-
-  msg += "📋 *EXPERIENCIA LABORAL*
-";
-  if(data.emp1_empresa) {
-    msg += `• Empresa 1: ${data.emp1_empresa} | ${data.emp1_cargo || '-'} | ${data.emp1_tiempo || '-'}
-`;
-    msg += `  Funciones: ${data.emp1_funciones || '-'}
-`;
-    msg += `  Salida: ${data.emp1_salida || '-'}
-`;
-  }
-  if(data.emp2_empresa) {
-    msg += `• Empresa 2: ${data.emp2_empresa} | ${data.emp2_cargo || '-'} | ${data.emp2_tiempo || '-'}
-`;
-    msg += `  Funciones: ${data.emp2_funciones || '-'}
-`;
-    msg += `  Salida: ${data.emp2_salida || '-'}
-`;
-  }
-  if(data.emp3_empresa) {
-    msg += `• Empresa 3: ${data.emp3_empresa} | ${data.emp3_cargo || '-'} | ${data.emp3_tiempo || '-'}
-`;
-  }
-  if(data.primer_empleo) msg += "• Este sería su primer empleo
-";
-  msg += "
-";
-
-  msg += "🕐 *DISPONIBILIDAD*
-";
-  msg += `• Incorporación inmediata: ${data.inmediato || '-'}
-`;
-  msg += `• Fines de semana: ${data.finde || '-'}
-`;
-  msg += `• Horario: ${data.horario_disp || '-'}
-
-`;
-
-  msg += "💬 *SOBRE EL CANDIDATO*
-";
-  msg += `• Por qué China House: ${data.por_que || '-'}
-`;
-  msg += `• Fortalezas: ${data.fortalezas || '-'}
-`;
-  msg += `• Desea aprender: ${data.aprender || '-'}
-`;
-  msg += `• Área de mejora: ${data.mejora || '-'}
-
-`;
-
-  msg += "👥 *REFERENCIAS*
-";
-  msg += `• Ref 1: ${data.ref1_nombre || '-'} | ${data.ref1_tel || '-'} | ${data.ref1_relacion || '-'}
-`;
-  msg += `• Ref 2: ${data.ref2_nombre || '-'} | ${data.ref2_tel || '-'} | ${data.ref2_relacion || '-'}
-
-`;
-
-  msg += "━━━━━━━━━━━━━━━━━━━━━━
-";
-  msg += "_Declaro que la información es verdadera y completa._
-";
-  msg += "━━━━━━━━━━━━━━━━━━━━━━";
-
+// FORMATEAR MENSAJE
+function formatearMensaje(data) {
+  let msg = "🍜 *SOLICITUD DE EMPLEO — CHINA HOUSE*\n";
+  msg += "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+  msg += "👤 *INFORMACIÓN PERSONAL*\n";
+  msg += "• Nombre: " + (data.nombre || '-') + "\n";
+  msg += "• Identidad: " + (data.identidad || '-') + "\n";
+  msg += "• Fecha Nac.: " + (data.fecha_nac || '-') + " | Edad: " + (data.edad || '-') + "\n";
+  msg += "• Teléfono: " + (data.telefono || '-') + "\n";
+  msg += "• Dirección: " + (data.direccion || '-') + "\n";
+  msg += "• Estado civil: " + (data.estado_civil || '-') + " | Hijos: " + (data.hijos || '0') + "\n";
+  msg += "• Licencia: " + (data.licencia || '-') + " | Transporte: " + (data.transporte || '-') + "\n\n";
+  msg += "🎓 *ACADÉMICO*\n";
+  msg += "• Nivel: " + (data.nivel_edu || '-') + " | Institución: " + (data.centro_edu || '-') + "\n";
+  msg += "• Estudia actualmente: " + (data.estudia || '-') + "\n";
+  if (data.carrera) msg += "• Carrera: " + data.carrera + " | Horario: " + (data.horario_estudio || '-') + "\n";
+  msg += "\n💼 *SITUACIÓN LABORAL*\n";
+  msg += "• Situación: " + (data.situacion || '-') + "\n";
+  if (data.empresa_actual) msg += "• Empresa: " + data.empresa_actual + " | Cargo: " + (data.cargo_actual || '-') + "\n";
+  msg += "• Motivo de cambio: " + (data.motivo_cambio || '-') + "\n\n";
+  msg += "📋 *EXPERIENCIA LABORAL*\n";
+  if (data.emp1_empresa) msg += "• Emp.1: " + data.emp1_empresa + " | " + (data.emp1_cargo || '-') + " | " + (data.emp1_tiempo || '-') + "\n  Funciones: " + (data.emp1_funciones || '-') + " | Salida: " + (data.emp1_salida || '-') + "\n";
+  if (data.emp2_empresa) msg += "• Emp.2: " + data.emp2_empresa + " | " + (data.emp2_cargo || '-') + " | " + (data.emp2_tiempo || '-') + "\n";
+  if (data.emp3_empresa) msg += "• Emp.3: " + data.emp3_empresa + " | " + (data.emp3_cargo || '-') + " | " + (data.emp3_tiempo || '-') + "\n";
+  if (data.primer_empleo) msg += "• Primer empleo\n";
+  msg += "\n🕐 *DISPONIBILIDAD*\n";
+  msg += "• Inmediato: " + (data.inmediato || '-') + " | Fines de semana: " + (data.finde || '-') + "\n";
+  msg += "• Horario: " + (data.horario_disp || '-') + "\n\n";
+  msg += "💬 *SOBRE EL CANDIDATO*\n";
+  msg += "• Por qué China House: " + (data.por_que || '-') + "\n";
+  msg += "• Fortalezas: " + (data.fortalezas || '-') + "\n";
+  msg += "• Desea aprender: " + (data.aprender || '-') + "\n";
+  msg += "• Área de mejora: " + (data.mejora || '-') + "\n\n";
+  msg += "👥 *REFERENCIAS*\n";
+  msg += "• Ref 1: " + (data.ref1_nombre || '-') + " | " + (data.ref1_tel || '-') + " | " + (data.ref1_relacion || '-') + "\n";
+  msg += "• Ref 2: " + (data.ref2_nombre || '-') + " | " + (data.ref2_tel || '-') + " | " + (data.ref2_relacion || '-') + "\n\n";
+  msg += "━━━━━━━━━━━━━━━━━━━━━━\n";
+  msg += "_Declaro que la información es verdadera y completa._";
   return msg;
 }
 
-// ── ENVIAR WHATSAPP ──
+// ENVIAR WHATSAPP
 function enviarWhatsApp() {
-  const form = document.getElementById('solicitudForm');
   const data = recopilarDatos();
-  const msg = formatearMensaje(data, false);
+  const msg = formatearMensaje(data);
   const url = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(msg);
-  window.open(url, '_blank');
+  window.location.href = url;
 }
 
-// ── ENVIAR EMAIL ──
+// ENVIAR EMAIL
 function enviarEmail() {
-  const form = document.getElementById('solicitudForm');
   const data = recopilarDatos();
   const asunto = "Solicitud de Empleo - " + (data.nombre || 'Candidato');
-  const msg = formatearMensaje(data, false).replace(/\*/g, '').replace(/━/g, '---');
-  const url = "mailto:" + EMAIL_DESTINO + "?subject=" + encodeURIComponent(asunto) + "&body=" + encodeURIComponent(msg);
-  window.location.href = url;
+  const msg = formatearMensaje(data).replace(/[*_]/g, '');
+  window.location.href = "mailto:" + EMAIL_DESTINO + "?subject=" + encodeURIComponent(asunto) + "&body=" + encodeURIComponent(msg);
 }
 </script>
 
