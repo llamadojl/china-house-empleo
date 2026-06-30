@@ -1193,10 +1193,6 @@ function formatearMensaje(data, incluirEval) {
 // ── ENVIAR WHATSAPP ──
 function enviarWhatsApp() {
   const form = document.getElementById('solicitudForm');
-  if (!form.checkValidity()) {
-    alert("Por favor complete los campos obligatorios marcados con *");
-    return;
-  }
   const data = recopilarDatos();
   const msg = formatearMensaje(data, false);
   const url = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(msg);
@@ -1206,10 +1202,6 @@ function enviarWhatsApp() {
 // ── ENVIAR EMAIL ──
 function enviarEmail() {
   const form = document.getElementById('solicitudForm');
-  if (!form.checkValidity()) {
-    alert("Por favor complete los campos obligatorios marcados con *");
-    return;
-  }
   const data = recopilarDatos();
   const asunto = "Solicitud de Empleo - " + (data.nombre || 'Candidato');
   const msg = formatearMensaje(data, false).replace(/\*/g, '').replace(/━/g, '---');
